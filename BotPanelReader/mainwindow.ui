@@ -27,10 +27,10 @@
    <widget class="QLabel" name="lImage">
     <property name="geometry">
      <rect>
-      <x>480</x>
+      <x>450</x>
       <y>120</y>
-      <width>211</width>
-      <height>151</height>
+      <width>241</width>
+      <height>171</height>
      </rect>
     </property>
     <property name="text">
@@ -71,6 +71,19 @@
     </property>
     <property name="text">
      <string>Analyser</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton_2">
+    <property name="geometry">
+     <rect>
+      <x>530</x>
+      <y>350</y>
+      <width>91</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Ouvrir</string>
     </property>
    </widget>
   </widget>

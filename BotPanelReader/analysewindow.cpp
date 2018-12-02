@@ -1,5 +1,8 @@
 #include "analysewindow.h"
 #include "ui_analysewindow.h"
+#include <histogrammewindow.h>
+#include "mainwindow.h"
+#include <QFileDialog>
 
 analyseWindow::analyseWindow(QWidget *parent) :
     QDialog(parent),
@@ -7,29 +10,28 @@ analyseWindow::analyseWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    /************* Menu Bar **************/
-    QMenu *fichier = menuBar()->addMenu("&Fichier");
-        QMenu *fichierRecents = new QMenu("Fichier récents");
-            QAction *recentAction = new QAction("Fichier1.txt");
-        fichierRecents->addAction(recentAction);
-   fichier->addMenu(fichierRecents);
+    setFixedSize(800,450);
 
-    QMenu *options = menuBar()->addMenu("&Options");
-        QAction *filtreAuto = new QAction("AutoFiltre");
-        filtreAuto->setCheckable(true);
-        filtreAuto->isChecked();
-    options->addAction(filtreAuto);
 
-    QMenu *aide = menuBar()->addMenu("&Aide");
-        QAction *aideAction = new QAction("Aide");
-    aide->addAction(aideAction);
-
-    QMenu *quitter = menuBar()->addMenu("&Quitter");
-        QAction *quitterAction = new QAction("Aide");
-    quitter->addAction(quitterAction);
 }
 
 analyseWindow::~analyseWindow()
 {
     delete ui;
+}
+
+void analyseWindow::on_pushButton_3_clicked()
+{
+    histogrammeWindow *f = new histogrammeWindow();
+    f->show();
+}
+
+void analyseWindow::on_pushButton_2_clicked()
+{
+    close();
+}
+
+void analyseWindow::on_pushButton_4_clicked()
+{
+    QString fichier = QFileDialog::getSaveFileName(this, "Enregistrer un fichier", QString(), "Images (*.png *.gif *.jpg *.jpeg)");
 }

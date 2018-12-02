@@ -15,6 +15,9 @@ public:
     explicit histogrammeWindow(QWidget *parent = 0);
     ~histogrammeWindow();
 
+private slots:
+    void on_pushButton_clicked();
+
 private:
     Ui::histogrammeWindow *ui;
 };

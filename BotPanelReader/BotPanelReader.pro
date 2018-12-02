@@ -5,6 +5,7 @@
 #-------------------------------------------------
 
 QT       += core gui
+TARGET = openCvQt
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -24,3 +25,13 @@ HEADERS  += mainwindow.h \
 FORMS    += mainwindow.ui \
     analysewindow.ui \
     histogrammewindow.ui
+
+
+INCLUDEPATH += C:\opencv\build\include
+
+LIBS += C:\opencv-build\bin\libopencv_core400.dll
+LIBS += C:\opencv-build\bin\libopencv_highgui400.dll
+LIBS += C:\opencv-build\bin\libopencv_imgcodecs400.dll
+LIBS += C:\opencv-build\bin\libopencv_imgproc400.dll
+LIBS += C:\opencv-build\bin\libopencv_features2d400.dll
+LIBS += C:\opencv-build\bin\libopencv_calib3d400.dll
