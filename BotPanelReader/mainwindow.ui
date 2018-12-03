@@ -27,14 +27,14 @@
    <widget class="QLabel" name="lImage">
     <property name="geometry">
      <rect>
-      <x>450</x>
-      <y>120</y>
-      <width>241</width>
-      <height>171</height>
+      <x>360</x>
+      <y>30</y>
+      <width>401</width>
+      <height>311</height>
      </rect>
     </property>
     <property name="text">
-     <string>Image</string>
+     <string>Cliquer sur Ouvrir pour charger une image</string>
     </property>
    </widget>
    <widget class="QComboBox" name="comboBox">

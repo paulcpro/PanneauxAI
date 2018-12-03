@@ -6,13 +6,10 @@
 #include <QMainWindow>
 #include "QFileDialog"
 #include "QMessageBox"
+#include <QPixmap>
 
-#include <opencv2\opencv.hpp>
-#include <opencv2/core/core.hpp>
-#include <opencv2/highgui/highgui.hpp>
+QString MainWindow::cheminImage = "";
 
-
-using namespace cv;
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -44,6 +41,9 @@ MainWindow::MainWindow(QWidget *parent) :
         connect(quitterAction, SIGNAL(triggered()), qApp, SLOT(quit()));
     quitter->addAction(quitterAction);
 
+    //Affichage photo
+    //QPixmap *pixmap_img = new QPixmap("C:/Users/win/Desktop/PanneauxAI/70.jpg");
+    //this->ui->lImage->setPixmap(pixmap_img->scaled(200,200));
 }
 
 MainWindow::~MainWindow()
@@ -51,33 +51,51 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::on_pushButton_clicked()
-{
-    analyseWindow *f = new analyseWindow();
-    f->show();
 
-
-    //Faire un get de l'image ouverte avec le bouton ouvrir////////////
-    //QString image = getCheminImage();
-    Mat3b bgr = imread("C:/Users/win/Desktop/PanneauxAI/stop-sign-model.png");
-
-    Mat3b hsv;
-    cvtColor(bgr, hsv, COLOR_BGR2HSV);
-
-    Mat1b mask1, mask2;
-    inRange(hsv, Scalar(0, 70, 50), Scalar(10, 255, 255), mask1);
-    inRange(hsv, Scalar(170, 70, 50), Scalar(180, 255, 255), mask2);
-
-    Mat1b mask = mask1 | mask2;
-
-    imshow("Mask", mask);
-    waitKey();
+/**********GET AND SET***********/
+QString MainWindow::getCheminImage() {
+return MainWindow::cheminImage;
 }
 
+
+void MainWindow::setCheminImage(QString x) {
+    MainWindow::cheminImage = x;
+}
+
+
+//Bouton Analyser
+void MainWindow::on_pushButton_clicked()
+{
+
+
+
+    if(getCheminImage() == "") {
+        QMessageBox::critical(this, "Erreur", "Sélectionner une image");
+    } else {
+        //Faire un get de l'image ouverte avec le bouton ouvrir////////////
+        QString image = getCheminImage();
+
+        QMessageBox::information(this,"chemin","chemin : " + image);
+        analyseWindow *f = new analyseWindow();
+        f->show();
+    }
+
+}
+
+
+//Bouton Ouvrir
 void MainWindow::on_pushButton_2_clicked()
 {
     //Dans la comboBox on pourrait afficher toutes les images d'un dossier.
     //Ouverture d'une image
     QString fichier = QFileDialog::getOpenFileName(this, "Ouvrir un fichier", QString(), "Images (*.png *.gif *.jpg *.jpeg)");
+    setCheminImage(fichier);
     QMessageBox::information(this, "Fichier", "Vous avez sélectionné :\n" + fichier);
+
+    QString image = getCheminImage();
+    int x = this->ui->lImage->width();
+    int y = this->ui->lImage->height();
+    QPixmap *pixmap_img = new QPixmap(image);
+    this->ui->lImage->setPixmap(pixmap_img->scaled(x,y));
+
 }

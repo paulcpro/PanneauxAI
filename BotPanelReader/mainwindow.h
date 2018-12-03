@@ -15,6 +15,10 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+    QString getCheminImage();
+    void setCheminImage(QString);
+
+
 private slots:
     void on_pushButton_clicked();
 
@@ -22,6 +26,7 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
+    static QString cheminImage;
 };
 
 #endif // MAINWINDOW_H
