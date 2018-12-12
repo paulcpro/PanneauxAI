@@ -1,5 +1,5 @@
 #include "mainwindow.h"
-#include <analysewindow.h>
+#include "analysewindow.h"
 #include "ui_mainwindow.h"
 #include <QMenuBar>
 #include <QMenu>
@@ -7,6 +7,7 @@
 #include "QFileDialog"
 #include "QMessageBox"
 #include <QPixmap>
+#include <QDesktopServices>
 
 QString MainWindow::cheminImage = "";
 
@@ -21,6 +22,11 @@ MainWindow::MainWindow(QWidget *parent) :
 
     /************* Menu Bar **************/
     QMenu *fichier = menuBar()->addMenu("&Fichier");
+            QAction *ouvrirImage = new QAction("Ouvrir");
+            //On doit faire un slot qui ouvre dans la fenêtre actuel l'image
+            connect(ouvrirImage, SIGNAL(triggered()), this, SLOT(affichageImage()));
+    fichier->addAction(ouvrirImage);
+
         QMenu *fichierRecents = new QMenu("Fichier récents");
             QAction *recentAction = new QAction("Fichier1.txt");
         fichierRecents->addAction(recentAction);
@@ -34,6 +40,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     QMenu *aide = menuBar()->addMenu("&Aide");
         QAction *aideAction = new QAction("Aide");
+        //Faire un slot qui va ouvrir un readme.txt se trouvant dans le dossier du logiciel pour l'utilisation du logiciel
+        connect(aideAction, SIGNAL(triggered()), this, SLOT(affichageDossier()));
     aide->addAction(aideAction);
 
     QMenu *quitter = menuBar()->addMenu("&Quitter");
@@ -41,9 +49,6 @@ MainWindow::MainWindow(QWidget *parent) :
         connect(quitterAction, SIGNAL(triggered()), qApp, SLOT(quit()));
     quitter->addAction(quitterAction);
 
-    //Affichage photo
-    //QPixmap *pixmap_img = new QPixmap("C:/Users/win/Desktop/PanneauxAI/70.jpg");
-    //this->ui->lImage->setPixmap(pixmap_img->scaled(200,200));
 }
 
 MainWindow::~MainWindow()
@@ -62,40 +67,57 @@ void MainWindow::setCheminImage(QString x) {
     MainWindow::cheminImage = x;
 }
 
+//Bouton MenuBar:: Aide
+void MainWindow::affichageDossier() {
+    //Sert à ouvrir un fichier grâce à un chemin indiquant le fichier à ouvrir
+    QDesktopServices::openUrl(QUrl("C:/BotPanelReader/readme.txt",QUrl::TolerantMode));
+}
 
 //Bouton Analyser
 void MainWindow::on_pushButton_clicked()
 {
-
-
-
-    if(getCheminImage() == "") {
-        QMessageBox::critical(this, "Erreur", "Sélectionner une image");
-    } else {
-        //Faire un get de l'image ouverte avec le bouton ouvrir////////////
-        QString image = getCheminImage();
-
-        QMessageBox::information(this,"chemin","chemin : " + image);
-        analyseWindow *f = new analyseWindow();
-        f->show();
-    }
-
+   //Fait tout le traitement d'images sans afficher les filtres
+    //Il affiche le kilomètrage du panneaux
 }
 
 
-//Bouton Ouvrir
-void MainWindow::on_pushButton_2_clicked()
-{
-    //Dans la comboBox on pourrait afficher toutes les images d'un dossier.
+//Bouton MenuBar::Ouvrir
+void MainWindow::affichageImage() {
     //Ouverture d'une image
     QString fichier = QFileDialog::getOpenFileName(this, "Ouvrir un fichier", QString(), "Images (*.png *.gif *.jpg *.jpeg)");
     setCheminImage(fichier);
-    QMessageBox::information(this, "Fichier", "Vous avez sélectionné :\n" + fichier);
 
     QString image = getCheminImage();
     int x = this->ui->lImage->width();
     int y = this->ui->lImage->height();
     QPixmap *pixmap_img = new QPixmap(image);
     this->ui->lImage->setPixmap(pixmap_img->scaled(x,y));
-
 }
+
+//Bouton Ouvrir
+void MainWindow::on_pushButton_2_clicked()
+{
+    //Ouverture d'une image
+    QString fichier = QFileDialog::getOpenFileName(this, "Ouvrir un fichier", QString(), "Images (*.png *.gif *.jpg *.jpeg)");
+    setCheminImage(fichier);
+
+    QString image = getCheminImage();
+    int x = this->ui->lImage->width();
+    int y = this->ui->lImage->height();
+    QPixmap *pixmap_img = new QPixmap(image);
+    this->ui->lImage->setPixmap(pixmap_img->scaled(x,y));
+}
+
+//Bouton détail
+void MainWindow::on_pushButton_3_clicked()
+{
+    //Mettre tout ce qui est dans la fenêtre analyse
+    if(getCheminImage() == "") {
+        QMessageBox::critical(this, "Erreur", "Sélectionner une image");
+    } else {
+        QString image = getCheminImage();
+        analyseWindow *f = new analyseWindow();
+        f->show();
+    }
+}
+
