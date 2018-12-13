@@ -90,21 +90,17 @@ analyseWindow::analyseWindow(QWidget *parent) :
     //Application du filtre rouge par défaut->
     std::string imageRC = imageR.toLocal8Bit().constData();
     Mat3b image = imread(imageRC); //Récupération de l'image
+    Mat3b imageBlack = imread(imageRC);
 
     Mat3b hsv; //Teinte (couleur) / Saturation (plus ou moins vif) / value (type de teinte)
     cvtColor(image, hsv, COLOR_BGR2HSV); //Teint l'image de base en la convertissant de RGB à HSV voir: https://docs.opencv.org/4.0.0/d8/d01/group__imgproc__color__conversions.html#ga397ae87e1288a81d2363b61574eb8cab
     //fonction cvtColor: 1er/Image 2e/Récupère un objet Mat3b pour y mettre le filtre 3e/Choix de du filtre à appliquer
 
-
-    //Dimensions non correcte du blur
-    //blur(src_gray, src_gray, Size(3,3) );
-    //Mat src, src_gray;
     Mat1b mask1, mask2;
 
-    /*
-    imshow("ImageBasic", image);
-    imshow("Teinte", hsv);
-    */
+    //imshow("ImageBasic", image);
+    //imshow("Teinte", hsv);
+
 
     //Application d'un premier m
     //ask pour ce type de couleur RGB;
@@ -115,12 +111,59 @@ analyseWindow::analyseWindow(QWidget *parent) :
     //Puis du second voir: https://docs.opencv.org/4.0.0/d2/de8/group__core__array.html#ga48af0ab51e36436c5d04340e036ce981
     inRange(hsv, Scalar(170, 70, 50), Scalar(180, 255, 255), mask2);
 
-    /*
-    imshow("Mask1", mask1);
-    imshow("Mask2", mask2);
-    */
+
+
+    //imshow("Mask1", mask1);
+    //imshow("Mask2", mask2);
 
     Mat1b mask = mask1 | mask2; //Application de plusieurs filtre en même temps
+
+    /***********************************/
+
+    /* Création du filtre noir */
+    Mat3b teinte;
+
+    //test COLOR_BGR2GRAY -> bug
+    //test COLOR_RGB2GRAY -> bug
+    //test COLOR_BGRA2RGBA -> bug
+    //test COLOR_GRAY2BGR -> bug
+    //test COLOR_BGR2HLS -> Teint en vert; laisse rouge; noir en violet
+
+    cvtColor(imageBlack, teinte, COLOR_BGR2HSV );
+
+    Mat1b maskTest1, maskTest2;
+
+
+    //imshow("Teinte Black", teinte);
+    //0,0,0 ; 255,255,255 => met tout en blanc
+    //0,0,0 ; 100,100,100 => BON RESULTAT
+    //0,0,0 ; 100,255,255 => color le rouge en noir
+    inRange(teinte, Scalar(0, 0, 0), Scalar(75, 75, 75), maskTest1);
+    //0,0,0 ; 50,50,50 => Retrouve bien le 70 mais pas entierement
+    //0,0,0 ; 75,75,75 => Retrouve bien le cercle rouge
+
+    //imshow("Teinte Black", teinte);
+    //0,0,0 ; 255,255,255 => met tout en blanc
+    //0,0,0 ; 100,100,100 => BON RESULTAT
+    //0,0,0 ; 100,255,255 => color le rouge en noir
+    //inRange(teinte, Scalar(0, 0, 0), Scalar(50, 50, 50), maskTest2);
+
+    imshow("Mask Test1", maskTest1);
+
+    Mat1b maskFinal = maskTest1 | mask;
+
+    imshow("Mask Final", maskFinal);
+
+    imwrite("C:/Resources/PanneauxAI/filtreFinal.jpg", maskFinal);
+
+    //imshow("Mask Test2", maskTest2);
+
+    //Mat1b maskBlack = maskTest1 | maskTest2;
+
+    //imshow("Mask Black", maskBlack);
+
+    /*****************************/
+
 
     /*********** FIN DU FILTRE ROUGE ***********/
 
@@ -162,6 +205,7 @@ analyseWindow::analyseWindow(QWidget *parent) :
 
     //Set un dossier par défaut; Ajout sélection par user
     QString defaultResources;
+
     imwrite( "C:/Resources/PanneauxAI/filtre.jpg", mask );
 
 
