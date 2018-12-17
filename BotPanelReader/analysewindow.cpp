@@ -18,6 +18,18 @@
 using namespace cv;
 using namespace std;
 
+QImage Mat2QImage(const cv::Mat3b &src) {
+        QImage dest(src.cols, src.rows, QImage::Format_ARGB32);
+        for (int y = 0; y < src.rows; ++y) {
+                const cv::Vec3b *srcrow = src[y];
+                QRgb *destrow = (QRgb*)dest.scanLine(y);
+                for (int x = 0; x < src.cols; ++x) {
+                        destrow[x] = qRgba(srcrow[x][2], srcrow[x][1], srcrow[x][0], 255);
+                }
+        }
+        return dest;
+}
+
 analyseWindow::analyseWindow(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::analyseWindow)
@@ -198,10 +210,32 @@ analyseWindow::analyseWindow(QWidget *parent) :
            // Sert à tracer le cercle
            int radius = c[2];
            circle( src, center, radius, Scalar(255,0,255), 3, LINE_AA);
+           Mat clone(src, Rect(center.x-radius, center.y-radius, radius*2, radius*2));
+
+
+           QFile file("image.png");     //clone
+                      file.open(QIODevice::WriteOnly);
+                      QImage img = Mat2QImage(clone);
+                      img.save(&file, "PNG");   //enregistrement de l'image
+                      file.close();
        }
        imshow("Detection de cercle", src);
     /********* FIN DU FILTRE CERCLE *********/
 
+       /********* TEST DECOUPAGE IMAGE *********/
+
+        //  Rect rectCrop = new Rect(cropCenterX, cropCenterY, radius, radius);
+        //  Mat croppedImage = new Mat(image, rectCrop);
+
+      // cv::GMat cv::gapi::crop(image, circles);
+
+        /*  Mat imatest = imread(imageRC);
+          Rect cropArea(image.cols/3, image.rows/4, image.cols/4, image.rows/4);
+          Mat croppedImage =image(cropArea);
+          imshow("image", image);
+          imshow("cropped image", croppedImage); */
+
+          /*FIN TEST DECOUPAGE IMAGE*/
 
     //Set un dossier par défaut; Ajout sélection par user
     QString defaultResources;
