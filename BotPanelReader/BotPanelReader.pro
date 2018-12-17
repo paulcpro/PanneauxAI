@@ -15,16 +15,13 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    analysewindow.cpp \
-    streamwindow.cpp
+    analysewindow.cpp
 
 HEADERS  += mainwindow.h \
-    analysewindow.h \
-    streamwindow.h
+    analysewindow.h
 
 FORMS    += mainwindow.ui \
-    analysewindow.ui \
-    streamwindow.ui
+    analysewindow.ui
 
 
 INCLUDEPATH += C:\opencv\build\include
