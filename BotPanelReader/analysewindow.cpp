@@ -18,18 +18,6 @@
 using namespace cv;
 using namespace std;
 
-QImage Mat2QImage(const cv::Mat3b &src) {
-        QImage dest(src.cols, src.rows, QImage::Format_ARGB32);
-        for (int y = 0; y < src.rows; ++y) {
-                const cv::Vec3b *srcrow = src[y];
-                QRgb *destrow = (QRgb*)dest.scanLine(y);
-                for (int x = 0; x < src.cols; ++x) {
-                        destrow[x] = qRgba(srcrow[x][2], srcrow[x][1], srcrow[x][0], 255);
-                }
-        }
-        return dest;
-}
-
 analyseWindow::analyseWindow(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::analyseWindow)
@@ -130,6 +118,9 @@ analyseWindow::analyseWindow(QWidget *parent) :
 
     Mat1b mask = mask1 | mask2; //Application de plusieurs filtre en même temps
 
+    //Sauvegarde du filtre rouge
+    imwrite( "C:/Resources/PanneauxAI/filtreRouge.jpg", mask);
+
     /***********************************/
 
     /* Création du filtre noir */
@@ -143,14 +134,15 @@ analyseWindow::analyseWindow(QWidget *parent) :
 
     cvtColor(imageBlack, teinte, COLOR_BGR2HSV );
 
-    Mat1b maskTest1, maskTest2;
+    Mat1b maskTest1;
+    //Mat1b maskTest2;
 
 
     //imshow("Teinte Black", teinte);
     //0,0,0 ; 255,255,255 => met tout en blanc
     //0,0,0 ; 100,100,100 => BON RESULTAT
     //0,0,0 ; 100,255,255 => color le rouge en noir
-    inRange(teinte, Scalar(0, 0, 0), Scalar(75, 75, 75), maskTest1);
+    inRange(teinte, Scalar(0, 0, 0), Scalar(80, 80, 80), maskTest1);
     //0,0,0 ; 50,50,50 => Retrouve bien le 70 mais pas entierement
     //0,0,0 ; 75,75,75 => Retrouve bien le cercle rouge
 
@@ -160,13 +152,16 @@ analyseWindow::analyseWindow(QWidget *parent) :
     //0,0,0 ; 100,255,255 => color le rouge en noir
     //inRange(teinte, Scalar(0, 0, 0), Scalar(50, 50, 50), maskTest2);
 
-    imshow("Mask Test1", maskTest1);
+    //imshow("Mask Test1", maskTest1);
 
+    /* Résultat avec filtre rouge et noir */
+    /*
     Mat1b maskFinal = maskTest1 | mask;
 
     imshow("Mask Final", maskFinal);
 
     imwrite("C:/Resources/PanneauxAI/filtreFinal.jpg", maskFinal);
+    */
 
     //imshow("Mask Test2", maskTest2);
 
@@ -174,13 +169,21 @@ analyseWindow::analyseWindow(QWidget *parent) :
 
     //imshow("Mask Black", maskBlack);
 
+
+    //Sauvegarde du filtre noir
+    imwrite("C:/Resources/PanneauxAI/filtreNoir.jpg", maskTest1);
     /*****************************/
 
 
     /*********** FIN DU FILTRE ROUGE ***********/
 
     /*      Création du filtre cercle       */
-       Mat src = imread(imageRC);
+
+    //Lecture de l'image filtré en rouge et noir
+    QString imageRouge = ("C:/Resources/PanneauxAI/filtreRouge.jpg");
+    std::string imageRougeC = imageRouge.toLocal8Bit().constData();
+
+       Mat src = imread(imageRougeC);
        // Check if image is loaded fine
        Mat gray;
 
@@ -210,50 +213,39 @@ analyseWindow::analyseWindow(QWidget *parent) :
            // Sert à tracer le cercle
            int radius = c[2];
            circle( src, center, radius, Scalar(255,0,255), 3, LINE_AA);
-           Mat clone(src, Rect(center.x-radius, center.y-radius, radius*2, radius*2));
-
-
-           QFile file("image.png");     //clone
-                      file.open(QIODevice::WriteOnly);
-                      QImage img = Mat2QImage(clone);
-                      img.save(&file, "PNG");   //enregistrement de l'image
-                      file.close();
        }
-       imshow("Detection de cercle", src);
+       //imshow("Detection de cercle", src);
+
+       //Sauvegarde du filtre détection de cercle
+       imwrite("C:/Resources/PanneauxAI/filtreCercle.jpg", src);
+
     /********* FIN DU FILTRE CERCLE *********/
 
-       /********* TEST DECOUPAGE IMAGE *********/
+       //Utilisation du filtre cercle sur le filtre rouge
 
-        //  Rect rectCrop = new Rect(cropCenterX, cropCenterY, radius, radius);
-        //  Mat croppedImage = new Mat(image, rectCrop);
-
-      // cv::GMat cv::gapi::crop(image, circles);
-
-        /*  Mat imatest = imread(imageRC);
-          Rect cropArea(image.cols/3, image.rows/4, image.cols/4, image.rows/4);
-          Mat croppedImage =image(cropArea);
-          imshow("image", image);
-          imshow("cropped image", croppedImage); */
-
-          /*FIN TEST DECOUPAGE IMAGE*/
-
-    //Set un dossier par défaut; Ajout sélection par user
-    QString defaultResources;
-
-    imwrite( "C:/Resources/PanneauxAI/filtre.jpg", mask );
-
-
-    //Affichage de l'image une fois fitlré dans le label
+    //Affichage de l'image une fois fitlré rouge dans le label
     int x4 = this->ui->label_4->width();
     int y4 = this->ui->label_4->height();
     //Affichage dans le label Image filtré
-    QPixmap *pixmap_img4 = new QPixmap("C:/Resources/PanneauxAI/filtre.jpg");
+    QPixmap *pixmap_img4 = new QPixmap("C:/Resources/PanneauxAI/filtreRouge.jpg");
     this->ui->label_4->setPixmap(pixmap_img4->scaled(x4,y4));
 
+    //Affichage de l'image une fois filtré noir dans le label
+    int x2 = this->ui->lImage_3->width();
+    int y2 = this->ui->lImage_3->height();
+    QPixmap *pixmap_img3 = new QPixmap("C:/Resources/PanneauxAI/filtreNoir.jpg");
+    this->ui->lImage_3->setPixmap(pixmap_img3->scaled(x2,y2));
 
+    //Affichage de l'image une fois filtré noir dans le label
+    int x5 = this->ui->lImage_5->width();
+    int y5 = this->ui->lImage_5->height();
+    QPixmap *pixmap_img5 = new QPixmap("C:/Resources/PanneauxAI/filtreCercle.jpg");
+    this->ui->lImage_5->setPixmap(pixmap_img5->scaled(x5,y5));
 
-    imshow("Mask", mask);
+    //imshow("Mask", mask);
     waitKey();
+
+    /********** FIN UTILISATION OPENCV **************/
 
 }
 
@@ -267,23 +259,22 @@ void analyseWindow::on_pushButton_2_clicked()
     close();
 }
 
-//Ce bouton n'existe plus mais obligé de mettre la methode correspondante sinon bug
+//bugged
 void analyseWindow::on_pushButton_3_clicked() {
 close();
 }
 
-//Vérfier en fonction des checkbox ce qu'on devra enregistrer//////////////////////////////////////
-void analyseWindow::on_pushButton_4_clicked()
-{
-    //Check tout
-    if(this->ui->checkBox_4->isChecked()) {
-    connect(this->ui->checkBox_4, SIGNAL(toggled(bool)), this->ui->checkBox_3, SLOT(setChecked(true)));
-    connect(this->ui->checkBox_4, SIGNAL(toggled(bool)), this->ui->checkBox_2, SLOT(setChecked(true)));
-    connect(this->ui->checkBox_4, SIGNAL(toggled(bool)), this->ui->checkBox, SLOT(setChecked(true)));
-    }
-
+//Sert à enregistrer les images des labels en fonction des checkbox checké
+void analyseWindow::on_pushButton_4_clicked() {
     //Filtre rouge
     if(this->ui->checkBox_4->isChecked()) {
+//std::string imageRougeC = imageRouge.toLocal8Bit().constData(); POUR QSTRING TO STRING
+        //std::string str = "example";
+        //QString qs = QString::fromLocal8Bit(str.c_str());
+        //Convertir cet image du string au qstring
+
+
+
         QString fichier = QFileDialog::getSaveFileName(this, "Enregistrer filtre rouge", QString(), "Images (*.png *.gif *.jpg *.jpeg)");
         QFile file(fichier);
 
@@ -308,13 +299,31 @@ void analyseWindow::on_pushButton_4_clicked()
 
     //Résultat
     if(this->ui->checkBox_3->isChecked()) {
-        QString fichier = QFileDialog::getSaveFileName(this, "Enregistrer filtre final", QString(), "Images (*.png *.gif *.jpg *.jpeg)");
-       // QFile file(fichier);
+        QString fichier = QFileDialog::getSaveFileName(this, "Enregistrer filtre final", "nouvelleImageEnregistrement", "Images (*.png *.gif *.jpg *.jpeg)");
+        QFile file(fichier);
 
         if(fichier == "") {
             QMessageBox::critical(this, "Erreur", "Votre fichier n'a pas pu être enregistré.");
         } else {
             QMessageBox::information(this, "Informations", "Votre fichier a été enregistré avec succès !");
         }
+    }
+}
+
+//bugged
+void analyseWindow::on_checkBox_4_stateChanged(int a){ a=1;}
+
+void analyseWindow::on_checkBox_4_clicked()
+{
+    if(!this->ui->checkBox_2->isChecked()) {
+    this->ui->checkBox_2->setChecked(true);
+    }
+
+    if(!this->ui->checkBox_3->isChecked()) {
+    this->ui->checkBox_3->setChecked(true);
+    }
+
+    if(!this->ui->checkBox->isChecked()) {
+    this->ui->checkBox->setChecked(true);
     }
 }
