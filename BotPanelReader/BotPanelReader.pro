@@ -29,6 +29,7 @@ FORMS    += mainwindow.ui \
 
 INCLUDEPATH += C:\opencv\build\include
 
+LIBS += C:\opencv-build\bin\libopencv_videoio400.dll
 LIBS += C:\opencv-build\bin\libopencv_core400.dll
 LIBS += C:\opencv-build\bin\libopencv_highgui400.dll
 LIBS += C:\opencv-build\bin\libopencv_imgcodecs400.dll

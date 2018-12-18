@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "analysewindow.h"
 #include "ui_mainwindow.h"
+#include "streamwindow.h"
 #include <QMenuBar>
 #include <QMenu>
 #include <QMainWindow>
@@ -121,3 +122,9 @@ void MainWindow::on_pushButton_3_clicked()
     }
 }
 
+
+void MainWindow::on_pushButton_4_clicked()
+{
+    streamWindow *f = new streamWindow();
+    f->show();
+}
