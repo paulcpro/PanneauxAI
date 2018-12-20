@@ -23,8 +23,7 @@ void streamWindow::on_pushButton_3_clicked()
 
 void streamWindow::closeEvent(QCloseEvent *event)
 {
-    if(video.isOpened())
-    {
+    if(video.isOpened()) {
     QMessageBox::warning(this, "Warning", "Stop the video before closing the application!");
     event->ignore();
     } else {
@@ -36,31 +35,25 @@ void streamWindow::closeEvent(QCloseEvent *event)
 void streamWindow::on_pushButton_pressed()
 {
     using namespace cv;
+    bool isCamera;
+    int cameraIndex = ui->lineEdit->text().toInt(&isCamera);
 
-    if(video.isOpened())
-    {
+    if(video.isOpened()) {
         ui->pushButton->setText("Start");
         video.release();
         return;
     }
 
-    bool isCamera;
-    int cameraIndex = ui->lineEdit->text().toInt(&isCamera);
-    if(isCamera)
-    {
-        if(!video.open(cameraIndex))
-        {
+    if(isCamera) {
+        if(!video.open(cameraIndex)) {
             QMessageBox::critical(this,
                                   "Camera Error",
                                   "Make sure you entered a correct camera index,"
                                   "<br>or that the camera is not being accessed by another program!");
             return;
         }
-    }
-    else
-    {
-        if(!video.open(ui->lineEdit->text().trimmed().toStdString()))
-        {
+    } else {
+        if(!video.open(ui->lineEdit->text().trimmed().toStdString())) {
             QMessageBox::critical(this,
                                   "Video Error",
                                   "Make sure you entered a correct and supported video file path,"
@@ -72,11 +65,9 @@ void streamWindow::on_pushButton_pressed()
     ui->pushButton->setText("Stop");
 
     Mat frame;
-    while(video.isOpened())
-    {
+    while(video.isOpened()) {
         video >> frame;
-        if(!frame.empty())
-        {
+        if(!frame.empty()) {
             copyMakeBorder(frame,
                            frame,
                            frame.rows/2,

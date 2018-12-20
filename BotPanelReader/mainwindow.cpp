@@ -50,6 +50,20 @@ MainWindow::MainWindow(QWidget *parent) :
         connect(quitterAction, SIGNAL(triggered()), qApp, SLOT(quit()));
     quitter->addAction(quitterAction);
 
+    /*
+    Application d'un css pour un bouton:
+
+    this->ui->pushButton->setStyleSheet("");
+    */
+
+    /* ComboBox Affichage Image */
+    QDir path("C:/Qt_Projets/PanneauxAI-master/PanneauxAI");
+    QStringList files = path.entryList(QDir::Files);
+    this->ui->comboBox->addItems(files);
+    this->ui->comboBox->show();
+    //Affichage de l'image sélectionné dans le label
+   /*************************************/
+
 }
 
 MainWindow::~MainWindow()

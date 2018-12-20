@@ -16,11 +16,13 @@ TEMPLATE = app
 SOURCES += main.cpp\
         mainwindow.cpp \
     analysewindow.cpp \
-    streamwindow.cpp
+    streamwindow.cpp \
+    learningwindow.cpp
 
 HEADERS  += mainwindow.h \
     analysewindow.h \
-    streamwindow.h
+    streamwindow.h \
+    learningwindow.h
 
 FORMS    += mainwindow.ui \
     analysewindow.ui \
@@ -36,3 +38,5 @@ LIBS += C:\opencv-build\bin\libopencv_imgcodecs400.dll
 LIBS += C:\opencv-build\bin\libopencv_imgproc400.dll
 LIBS += C:\opencv-build\bin\libopencv_features2d400.dll
 LIBS += C:\opencv-build\bin\libopencv_calib3d400.dll
+LIBS += C:\opencv-build\bin\libopencv_calib3d400.dll
+LIBS += C:\opencv-build\bin\libopencv_ml400.dll
