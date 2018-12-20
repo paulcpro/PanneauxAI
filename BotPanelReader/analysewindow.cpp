@@ -14,30 +14,9 @@
 #include <QMainWindow>
 #include <vector>
 
-#include "opencv2/objdetect/objdetect.hpp"
-#include "opencv2/imgproc/imgproc.hpp"
-#include <iostream>
-#include <stdio.h>
-#include <cmath>
-#include <stdlib.h>
-#include <opencv2/ml.hpp>
-
 
 using namespace cv;
-using namespace ml;
 using namespace std;
-
-QImage Mat2QImage(const cv::Mat3b &src) {
-        QImage dest(src.cols, src.rows, QImage::Format_ARGB32);
-        for (int y = 0; y < src.rows; ++y) {
-                const cv::Vec3b *srcrow = src[y];
-                QRgb *destrow = (QRgb*)dest.scanLine(y);
-                for (int x = 0; x < src.cols; ++x) {
-                        destrow[x] = qRgba(srcrow[x][2], srcrow[x][1], srcrow[x][0], 255);
-                }
-        }
-        return dest;
-}
 
 analyseWindow::analyseWindow(QWidget *parent) :
     QDialog(parent),
@@ -45,6 +24,7 @@ analyseWindow::analyseWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    setWindowIcon(QIcon("C:/Cours/Projet BotPanelReader/icon.png"));
     setFixedSize(800,600);
     show();
 
@@ -93,7 +73,8 @@ analyseWindow::analyseWindow(QWidget *parent) :
 
     QMenu *quitter = fB->menuBar()->addMenu("&Quitter");
         QAction *quitterAction = new QAction("Quitter");
-        //connect(quitterAction, SIGNAL(triggered()), qApp, SLOT(quit()));
+        connect(quitterAction, SIGNAL(triggered()), qApp, SLOT(quit()));
+        quitterAction->setShortcut(QKeySequence("Ctrl+Q"));
     quitter->addAction(quitterAction);
 
 
@@ -133,18 +114,60 @@ analyseWindow::analyseWindow(QWidget *parent) :
     inRange(hsv, Scalar(170, 70, 50), Scalar(180, 255, 255), mask2);
 
 
-
     //imshow("Mask1", mask1);
     //imshow("Mask2", mask2);
 
     Mat1b mask = mask1 | mask2; //Application de plusieurs filtre en même temps
 
     //Sauvegarde du filtre rouge
-    imwrite( "C:/Users/danym/Documents/Cours_CFI_MONTIGNY/Projet_Panneau/PanneauxAI-master_18122018/PanneauxAI-master/PanneauxAI/filtreRouge.jpg", mask);
+    imwrite( "C:/Resources/PanneauxAI/filtreRouge.jpg", mask);
 
     /***********************************/
 
+    /* Création du filtre noir */
+    Mat3b teinte;
 
+    cvtColor(imageBlack, teinte, COLOR_BGR2HSV );
+
+    Mat1b maskTest1;
+    //Mat1b maskTest2;
+
+
+    //imshow("Teinte Black", teinte);
+    //0,0,0 ; 255,255,255 => met tout en blanc
+    //0,0,0 ; 100,100,100 => BON RESULTAT
+    //0,0,0 ; 100,255,255 => color le rouge en noir
+    inRange(teinte, Scalar(0, 0, 0), Scalar(80, 80, 80), maskTest1);
+    //0,0,0 ; 50,50,50 => Retrouve bien le 70 mais pas entierement
+    //0,0,0 ; 75,75,75 => Retrouve bien le cercle rouge
+
+    //imshow("Teinte Black", teinte);
+    //0,0,0 ; 255,255,255 => met tout en blanc
+    //0,0,0 ; 100,100,100 => BON RESULTAT
+    //0,0,0 ; 100,255,255 => color le rouge en noir
+    //inRange(teinte, Scalar(0, 0, 0), Scalar(50, 50, 50), maskTest2);
+
+    //imshow("Mask Test1", maskTest1);
+
+    /* Résultat avec filtre rouge et noir */
+    /*
+    Mat1b maskFinal = maskTest1 | mask;
+
+    imshow("Mask Final", maskFinal);
+
+    imwrite("C:/Resources/PanneauxAI/filtreFinal.jpg", maskFinal);
+    */
+
+    //imshow("Mask Test2", maskTest2);
+
+    //Mat1b maskBlack = maskTest1 | maskTest2;
+
+    //imshow("Mask Black", maskBlack);
+
+
+    //Sauvegarde du filtre noir
+    imwrite("C:/Resources/PanneauxAI/filtreNoir.jpg", maskTest1);
+    /*****************************/
 
 
     /*********** FIN DU FILTRE ROUGE ***********/
@@ -152,8 +175,8 @@ analyseWindow::analyseWindow(QWidget *parent) :
     /*      Création du filtre cercle       */
 
     //Lecture de l'image filtré en rouge et noir
-   QString imageRouge = ("C:/Users/danym/Documents/Cours_CFI_MONTIGNY/Projet_Panneau/PanneauxAI-master_18122018/PanneauxAI-master/PanneauxAI/filtreRouge.jpg");
-   std::string imageRougeC = imageRouge.toLocal8Bit().constData();
+    QString imageRouge = ("C:/Resources/PanneauxAI/filtreRouge.jpg");
+    std::string imageRougeC = imageRouge.toLocal8Bit().constData();
 
        Mat src = imread(imageRougeC);
        // Check if image is loaded fine
@@ -185,92 +208,13 @@ analyseWindow::analyseWindow(QWidget *parent) :
            // Sert à tracer le cercle
            int radius = c[2];
            circle( src, center, radius, Scalar(255,0,255), 3, LINE_AA);
-
-
-           Mat src2 = imread(imageRC);
-           Mat clone(src2, Rect(center.x-radius, center.y-radius, radius*2, radius*2));
-
-
-                      QFile file("image.png");     //clone
-                                 file.open(QIODevice::WriteOnly);
-                                 QImage img = Mat2QImage(clone);
-                                 img.save(&file, "PNG");   //enregistrement de l'image
-                                 file.close();
-
-                      imshow("clone", clone);
-
        }
        //imshow("Detection de cercle", src);
 
        //Sauvegarde du filtre détection de cercle
-       imwrite("C:/Users/danym/Documents/Cours_CFI_MONTIGNY/Projet_Panneau/PanneauxAI-master_18122018/PanneauxAI-master/PanneauxAI/filtreCercle.jpg", src);
-
-
-       ////Test lecture chiffre////
-
-
-
-
-
-
+       imwrite("C:/Resources/PanneauxAI/filtreCercle.jpg", src);
 
     /********* FIN DU FILTRE CERCLE *********/
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
- //       Création du filtre noir */
- //      Mat3b teinte;
-//       QString imagecoupe = ("C:/Users/danym/Documents/Cours_CFI_MONTIGNY/Projet_Panneau/BotPanelReader_18122018_1142/Build-BotPanelReader-Desktop_Qt_5_9_0_MinGW_32bit-Debug/image.png");
-//       std::string imageCoupe = imagecoupe.toLocal8Bit().constData();
-//       Mat src3 = imread(imageCoupe);
-       //test COLOR_BGR2GRAY -> bug
-       //test COLOR_RGB2GRAY -> bug
-       //test COLOR_BGRA2RGBA -> bug
-       //test COLOR_GRAY2BGR -> bug
-       //test COLOR_BGR2HLS -> Teint en vert; laisse rouge; noir en violet
-
-//       cvtColor(src3, teinte, COLOR_BGR2HSV );
-
-//       Mat1b maskTest1;
-       //Mat1b maskTest2;
-
-
-       //imshow("Teinte Black", teinte);
-       //0,0,0 ; 255,255,255 => met tout en blanc
-       //0,0,0 ; 100,100,100 => BON RESULTAT
-       //0,0,0 ; 100,255,255 => color le rouge en noir
-//       inRange(teinte, Scalar(0, 0, 0), Scalar(80, 80, 80), maskTest1);
-       //0,0,0 ; 50,50,50 => Retrouve bien le 70 mais pas entierement
-       //0,0,0 ; 75,75,75 => Retrouve bien le cercle rouge
-
-       //imshow("Teinte Black", teinte);
-       //0,0,0 ; 255,255,255 => met tout en blanc
-       //0,0,0 ; 100,100,100 => BON RESULTAT
-       //0,0,0 ; 100,255,255 => color le rouge en noir
-       //inRange(teinte, Scalar(0, 0, 0), Scalar(50, 50, 50), maskTest2);
-
-//       imshow("Mask Test1", maskTest1);
-
-       /* Résultat avec filtre rouge et noir */
-       /*
-       Mat1b maskFinal = maskTest1 | mask;
-
-       imshow("Mask Final", maskFinal);
-
-       imwrite("C:/Resources/PanneauxAI/filtreFinal.jpg", maskFinal);
-       */
-
-       //imshow("Mask Test2", maskTest2);
-
-       //Mat1b maskBlack = maskTest1 | maskTest2;
-
-       //imshow("Mask Black", maskBlack);
-
-
-       //Sauvegarde du filtre noir
-//      imwrite("C:/Users/danym/Documents/Cours_CFI_MONTIGNY/Projet_Panneau/PanneauxAI-master_18122018/PanneauxAI-master/PanneauxAI/filtreNoir.jpg", maskTest1);
-       /*****************************/
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
        //Utilisation du filtre cercle sur le filtre rouge
 
@@ -278,33 +222,27 @@ analyseWindow::analyseWindow(QWidget *parent) :
     int x4 = this->ui->label_4->width();
     int y4 = this->ui->label_4->height();
     //Affichage dans le label Image filtré
-    QPixmap *pixmap_img4 = new QPixmap("C:/Users/danym/Documents/Cours_CFI_MONTIGNY/Projet_Panneau/PanneauxAI-master_18122018/PanneauxAI-master/PanneauxAI/filtreRouge.jpg");
+    QPixmap *pixmap_img4 = new QPixmap("C:/Resources/PanneauxAI/filtreRouge.jpg");
     this->ui->label_4->setPixmap(pixmap_img4->scaled(x4,y4));
 
     //Affichage de l'image une fois filtré noir dans le label
     int x2 = this->ui->lImage_3->width();
     int y2 = this->ui->lImage_3->height();
-    QPixmap *pixmap_img3 = new QPixmap("C:/Users/danym/Documents/Cours_CFI_MONTIGNY/Projet_Panneau/PanneauxAI-master_18122018/PanneauxAI-master/PanneauxAI/filtreNoir.jpg");
+    QPixmap *pixmap_img3 = new QPixmap("C:/Resources/PanneauxAI/filtreNoir.jpg");
     this->ui->lImage_3->setPixmap(pixmap_img3->scaled(x2,y2));
 
     //Affichage de l'image une fois filtré noir dans le label
     int x5 = this->ui->lImage_5->width();
     int y5 = this->ui->lImage_5->height();
-    QPixmap *pixmap_img5 = new QPixmap("C:/Users/danym/Documents/Cours_CFI_MONTIGNY/Projet_Panneau/PanneauxAI-master_18122018/PanneauxAI-master/PanneauxAI/filtreCercle.jpg");
+    QPixmap *pixmap_img5 = new QPixmap("C:/Resources/PanneauxAI/filtreCercle.jpg");
     this->ui->lImage_5->setPixmap(pixmap_img5->scaled(x5,y5));
 
     //imshow("Mask", mask);
     waitKey();
 
-
     /********** FIN UTILISATION OPENCV **************/
 
 }
-
-
-
-
-
 
 analyseWindow::~analyseWindow()
 {

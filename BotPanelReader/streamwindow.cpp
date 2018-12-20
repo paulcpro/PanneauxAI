@@ -6,6 +6,8 @@ streamWindow::streamWindow(QWidget *parent) :
     ui(new Ui::streamWindow)
 {
     ui->setupUi(this);
+
+    setWindowIcon(QIcon("C:/Cours/Projet BotPanelReader/icon.png"));
     setFixedSize(800,600);
     ui->graphicsView->setScene(new QGraphicsScene(this));
     ui->graphicsView->scene()->addItem(&pixmap);
@@ -38,13 +40,17 @@ void streamWindow::on_pushButton_pressed()
     bool isCamera;
     int cameraIndex = ui->lineEdit->text().toInt(&isCamera);
 
+    //Si la vidéo commence à stream
     if(video.isOpened()) {
         ui->pushButton->setText("Start");
+
+        //Ferme la capture de la vidéo
         video.release();
         return;
     }
 
     if(isCamera) {
+        //Vérifie si le port entré contient la cam
         if(!video.open(cameraIndex)) {
             QMessageBox::critical(this,
                                   "Camera Error",
@@ -53,6 +59,7 @@ void streamWindow::on_pushButton_pressed()
             return;
         }
     } else {
+        //Vérifie si la vidéo peut etre lu
         if(!video.open(ui->lineEdit->text().trimmed().toStdString())) {
             QMessageBox::critical(this,
                                   "Video Error",
@@ -65,22 +72,21 @@ void streamWindow::on_pushButton_pressed()
     ui->pushButton->setText("Stop");
 
     Mat frame;
+
+    //tant que la vidéo stream
     while(video.isOpened()) {
+        //On affiche chaque image
         video >> frame;
         if(!frame.empty()) {
-            copyMakeBorder(frame,
-                           frame,
-                           frame.rows/2,
-                           frame.rows/2,
-                           frame.cols/2,
-                           frame.cols/2,
-                           BORDER_REFLECT);
-
             QImage qimg(frame.data,
                         frame.cols,
                         frame.rows,
                         frame.step,
                         QImage::Format_RGB888);
+
+            //Faire un QMessageBox pour afficher les infos des frames
+
+
             pixmap.setPixmap( QPixmap::fromImage(qimg.rgbSwapped()) );
             ui->graphicsView->fitInView(&pixmap, Qt::KeepAspectRatio);
         }

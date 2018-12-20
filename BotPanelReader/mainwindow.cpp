@@ -20,6 +20,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
 
     setFixedSize(800,450);
+    //this->setWindowIcon(QIcon(QCoreApplication::applicationDirPath() + "C:/Cours/Projet BotPanelReader/icon.png"));
+    setWindowIcon(QIcon("C:/Cours/Projet BotPanelReader/icon.png"));
 
     /************* Menu Bar **************/
     QMenu *fichier = menuBar()->addMenu("&Fichier");
@@ -48,6 +50,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QMenu *quitter = menuBar()->addMenu("&Quitter");
         QAction *quitterAction = new QAction("Quitter");
         connect(quitterAction, SIGNAL(triggered()), qApp, SLOT(quit()));
+        quitterAction->setShortcut(QKeySequence("Ctrl+Q"));
     quitter->addAction(quitterAction);
 
     /*
@@ -57,11 +60,10 @@ MainWindow::MainWindow(QWidget *parent) :
     */
 
     /* ComboBox Affichage Image */
-    QDir path("C:/Qt_Projets/PanneauxAI-master/PanneauxAI");
+    QDir path("C:/Resources/PanneauxAI");
     QStringList files = path.entryList(QDir::Files);
     this->ui->comboBox->addItems(files);
     this->ui->comboBox->show();
-    //Affichage de l'image sélectionné dans le label
    /*************************************/
 
 }
@@ -134,6 +136,7 @@ void MainWindow::on_pushButton_3_clicked()
         analyseWindow *f = new analyseWindow();
         f->show();
     }
+
 }
 
 
@@ -141,4 +144,16 @@ void MainWindow::on_pushButton_4_clicked()
 {
     streamWindow *f = new streamWindow();
     f->show();
+}
+
+void MainWindow::on_pushButton_5_clicked()
+{
+    //Affichage de l'image sélectionné dans le label
+    int x = this->ui->lImage->width();
+    int y = this->ui->lImage->height();
+    QString selected = this->ui->comboBox->currentText();
+    setCheminImage("C:/Resources/PanneauxAI/" + selected);
+    QString chemin = getCheminImage();
+    QPixmap *pixmap_img = new QPixmap(chemin);
+    this->ui->lImage->setPixmap(pixmap_img->scaled(x,y));
 }
