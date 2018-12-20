@@ -20,7 +20,6 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
 
     setFixedSize(800,450);
-    //this->setWindowIcon(QIcon(QCoreApplication::applicationDirPath() + "C:/Cours/Projet BotPanelReader/icon.png"));
     setWindowIcon(QIcon("C:/Cours/Projet BotPanelReader/icon.png"));
 
     /************* Menu Bar **************/
@@ -52,12 +51,6 @@ MainWindow::MainWindow(QWidget *parent) :
         connect(quitterAction, SIGNAL(triggered()), qApp, SLOT(quit()));
         quitterAction->setShortcut(QKeySequence("Ctrl+Q"));
     quitter->addAction(quitterAction);
-
-    /*
-    Application d'un css pour un bouton:
-
-    this->ui->pushButton->setStyleSheet("");
-    */
 
     /* ComboBox Affichage Image */
     QDir path("C:/Resources/PanneauxAI");
@@ -148,12 +141,14 @@ void MainWindow::on_pushButton_4_clicked()
 
 void MainWindow::on_pushButton_5_clicked()
 {
-    //Affichage de l'image sélectionné dans le label
-    int x = this->ui->lImage->width();
-    int y = this->ui->lImage->height();
-    QString selected = this->ui->comboBox->currentText();
-    setCheminImage("C:/Resources/PanneauxAI/" + selected);
-    QString chemin = getCheminImage();
-    QPixmap *pixmap_img = new QPixmap(chemin);
-    this->ui->lImage->setPixmap(pixmap_img->scaled(x,y));
+       //Affichage de l'image sélectionné dans le label
+       int x = this->ui->lImage->width();
+       int y = this->ui->lImage->height();
+       QString selected = this->ui->comboBox->currentText();
+       setCheminImage("C:/Resources/PanneauxAI/" + selected);
+       QString chemin = getCheminImage();
+       QPixmap *pixmap_img = new QPixmap(chemin);
+       this->ui->lImage->setPixmap(pixmap_img->scaled(x,y));
 }
+
+void MainWindow::on_pushButton_6_clicked() { }
