@@ -1,0 +1,9 @@
+1) Application du filtre rouge => Détecte le panneaux
+
+2) Application du filtre détection de cercle  sur filtre rouge => Détecter le contour du panneaux
+
+3) Application du filtre crop => Rogne le panneaux
+
+4) Application du filtre noir => Détecte le kilomètrage
+
+5) Si panneaux contient forme reconnu : Lecture/Reconnaissance des chiffres
