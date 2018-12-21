@@ -108,7 +108,7 @@ void MainWindow::setCheminImage(QString x) {
 //Bouton MenuBar:: Aide
 void MainWindow::affichageDossier() {
     //Sert à ouvrir un fichier grâce à un chemin indiquant le fichier à ouvrir
-    QDesktopServices::openUrl(QUrl("C:/BotPanelReader/readme.txt",QUrl::TolerantMode));
+    QDesktopServices::openUrl(QUrl("C:/BotPanelReader/Mode_d'emploi.pdf",QUrl::TolerantMode));
 }
 
 //Bouton Analyser
